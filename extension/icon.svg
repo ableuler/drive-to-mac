@@ -1,0 +1,16 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- High-contrast Circle -->
+  <circle cx="64" cy="64" r="60" fill="#222222" />
+  
+  <!-- Outer Eye Shape -->
+  <path d="M12 64C12 64 32 28 64 28C96 28 116 64 116 64C116 64 96 100 64 100C32 100 12 64 12 64Z" fill="white" />
+  
+  <!-- Iris -->
+  <circle cx="64" cy="64" r="24" fill="#00D1FF" />
+  
+  <!-- Pupil -->
+  <circle cx="64" cy="64" r="12" fill="black" />
+  
+  <!-- Reflection -->
+  <circle cx="56" cy="56" r="4" fill="white" />
+</svg>

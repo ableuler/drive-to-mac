@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Reveal in Finder for Google Drive",
+  "version": "1.0",
+  "description": "Adds a context menu to reveal Google Drive files in macOS Finder.",
+  "permissions": [
+    "nativeMessaging",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://drive.google.com/*"
+  ],
+  "icons": {
+    "16": "icon.svg",
+    "48": "icon.svg",
+    "128": "icon.svg"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://drive.google.com/*"],
+      "js": ["content_script.js"]
+    }
+  ]
+}
