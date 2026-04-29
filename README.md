@@ -1,3 +1,6 @@
+-------
+### Disclaimer: This project is entirely vibe-coded. It works for me, but I'm pretty sure it will break in the future when the inner workings of the Google Drive client application change. Use at your own risk. 
+-------
 # Reveal in Finder for Google Drive (macOS)
 
 This project provides a Chrome extension and a native messaging host that allows you to right-click a file or folder in the Google Drive web interface and "Reveal in Finder" on your Mac.
@@ -49,7 +52,7 @@ The host needs to be registered so Chrome can execute it.
 
 ## Usage
 1.  Go to [drive.google.com](https://drive.google.com).
-2.  Right-click any file or folder.
+2.  Shift-right-click any file or folder. Note that the regular right click opens the google drive context, while shift + right-click opens the browser context menu. 
 3.  Select **Reveal in Finder**.
 4.  The corresponding file should be highlighted in a new Finder window.
 
@@ -57,5 +60,4 @@ The host needs to be registered so Chrome can execute it.
 The native host logs errors to `/tmp/drive_to_mac_debug.log`. If the extension fails to reveal a file, check this log for database query errors or path resolution issues.
 
 ## Limitations
-*   Only supports macOS (due to `CloudStorage` path logic and `open -R` command).
 *   Relies on the internal structure of Google Drive for Desktop's SQLite database, which may change in future updates.
