@@ -48,7 +48,7 @@ The host needs to be registered so Chrome can execute it.
 2.  Enable **Developer mode** (top right).
 3.  Click **Load unpacked**.
 4.  Select the `extension/` folder in this repository.
-5.  Note the **Extension ID** and ensure it matches the `EXTENSION_ID` in `install_host.sh`. If it differs, update the script and run it again.
+5.  Note the **Extension ID** and ensure it matches the `EXTENSION_ID` in `install_host.sh`. If it differs (it will differ!), update the script and run it again.
 
 ## Usage
 1.  Go to [drive.google.com](https://drive.google.com).
