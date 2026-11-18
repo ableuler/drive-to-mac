@@ -56,7 +56,15 @@ def find_cloud_storage_path(email):
         path = os.path.join(base_dir, target)
         if os.path.exists(path):
             return path
-            
+        # The email parsed from the protobuf blob can carry trailing bytes
+        # (e.g. "user@gmail.comZ"), so match the longest folder whose email is a prefix.
+        candidates = [e for e in os.listdir(base_dir)
+                      if e.startswith("GoogleDrive-") and email.startswith(e[len("GoogleDrive-"):])]
+        if candidates:
+            return os.path.join(base_dir, max(candidates, key=len))
+        log_debug(f"No CloudStorage folder matches account email {email!r}")
+        return None
+
     for entry in os.listdir(base_dir):
         if entry.startswith("GoogleDrive-"):
             return os.path.join(base_dir, entry)
@@ -113,6 +121,22 @@ def get_path_from_web_id(web_id):
                 cursor.execute("SELECT parent_stable_id FROM stable_parents WHERE item_stable_id = ?", (current_stable_id,))
                 parent_row = cursor.fetchone()
                 
+                if not parent_row and not team_drive_stable_id:
+                    # Items shared with me have no parent in my Drive. If a shortcut points
+                    # to it, Drive for desktop shows it at the shortcut's location instead.
+                    cursor.execute("SELECT cloud_id FROM stable_ids WHERE stable_id = ?", (current_stable_id,))
+                    cloud_row = cursor.fetchone()
+                    if cloud_row:
+                        cursor.execute(
+                            "SELECT i.stable_id FROM items i JOIN stable_parents p ON p.item_stable_id = i.stable_id "
+                            "WHERE i.mime_type = 'application/vnd.google-apps.shortcut' AND i.trashed = 0 "
+                            "AND instr(CAST(i.proto AS BLOB), ?) > 0 LIMIT 1",
+                            (str(cloud_row[0]).encode('utf-8'),))
+                        shortcut_row = cursor.fetchone()
+                        if shortcut_row:
+                            current_stable_id = shortcut_row[0]
+                            continue
+
                 if not parent_row:
                     if team_drive_stable_id:
                         path_components.insert(0, local_title)
