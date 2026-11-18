@@ -35,20 +35,18 @@ It bridges the gap between the Google Drive web UI and the local [Google Drive f
 ### 2. Install the Native Messaging Host
 The host needs to be registered so Chrome can execute it.
 
-1.  Open `install_host.sh`.
-2.  Update `PYTHON_PATH` and `SCRIPT_PATH` if they differ from your local setup.
-3.  Run the script:
-    ```bash
-    ./install_host.sh
-    ```
-    This creates a JSON manifest in `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.github.drive_to_mac.json`.
+Run the script from anywhere:
+```bash
+./install_host.sh
+```
+It uses the `python3` on your `PATH` (override with `PYTHON_PATH=/path/to/python3`), generates a small wrapper `drive_to_mac_host.sh` next to the host script, and creates a JSON manifest in `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.github.drive_to_mac.json`.
 
 ### 3. Install the Chrome Extension
 1.  Open Chrome and navigate to `chrome://extensions/`.
 2.  Enable **Developer mode** (top right).
 3.  Click **Load unpacked**.
 4.  Select the `extension/` folder in this repository.
-5.  Note the **Extension ID** and ensure it matches the `EXTENSION_ID` in `install_host.sh`. If it differs (it will differ!), update the script and run it again.
+5.  Note the **Extension ID** and pass it to the installer: `EXTENSION_ID=<your id> ./install_host.sh`.
 
 ## Usage
 1.  Go to [drive.google.com](https://drive.google.com).

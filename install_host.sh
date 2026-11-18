@@ -1,26 +1,30 @@
 #!/bin/bash
+set -euo pipefail
 
 HOST_NAME="com.github.drive_to_mac"
-PYTHON_PATH="$HOME/.local/bin/python3"
-SCRIPT_PATH="$HOME/src/drive_to_mac/drive_to_mac_host.py"
-# Pointing directly to the python script with the correct shebang is usually most stable
-MANIFEST_PATH="$HOME/src/drive_to_mac/${HOST_NAME}.json"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_PATH="${SCRIPT_DIR}/drive_to_mac_host.py"
+# Chrome starts native hosts with a minimal PATH, so pin the interpreter found now.
+PYTHON_PATH="${PYTHON_PATH:-$(command -v python3)}"
+WRAPPER_PATH="${SCRIPT_DIR}/drive_to_mac_host.sh"
 TARGET_DIR="${HOME}/Library/Application Support/Google/Chrome/NativeMessagingHosts"
-EXTENSION_ID="ahjlddpdcggpflpamdmofjfkhmdocpka"
+# Unpacked extensions get an ID derived from their folder path; check chrome://extensions.
+EXTENSION_ID="${EXTENSION_ID:-ahjlddpdcggpflpamdmofjfkhmdocpka}"
 
-# 1. Update the shebang in the host script to be absolute
-echo "#!$PYTHON_PATH" > "$SCRIPT_PATH.tmp"
-grep -v "^#!" "$SCRIPT_PATH" >> "$SCRIPT_PATH.tmp"
-mv "$SCRIPT_PATH.tmp" "$SCRIPT_PATH"
-chmod 755 "$SCRIPT_PATH"
+# 1. Generate a wrapper that runs the host with the chosen interpreter
+cat <<EOF > "$WRAPPER_PATH"
+#!/bin/sh
+exec "${PYTHON_PATH}" "${SCRIPT_PATH}" "\$@"
+EOF
+chmod 755 "$WRAPPER_PATH"
 
-# 2. Create the manifest pointing DIRECTLY to the python script
-# and ensure the origin has the trailing slash.
-cat <<EOF > "$MANIFEST_PATH"
+# 2. Install the manifest (the origin needs the trailing slash)
+mkdir -p "$TARGET_DIR"
+cat <<EOF > "$TARGET_DIR/${HOST_NAME}.json"
 {
   "name": "${HOST_NAME}",
   "description": "Reveal Google Drive files in macOS Finder",
-  "path": "${SCRIPT_PATH}",
+  "path": "${WRAPPER_PATH}",
   "type": "stdio",
   "allowed_origins": [
     "chrome-extension://${EXTENSION_ID}/"
@@ -28,12 +32,7 @@ cat <<EOF > "$MANIFEST_PATH"
 }
 EOF
 
-# 3. Clean installation
-rm -rf "$TARGET_DIR/${HOST_NAME}.json"
-mkdir -p "$TARGET_DIR"
-cp "$MANIFEST_PATH" "$TARGET_DIR/${HOST_NAME}.json"
-
-echo "Re-installed Native Messaging host."
+echo "Installed Native Messaging host."
 echo "Manifest: $TARGET_DIR/${HOST_NAME}.json"
-echo "Target Script: $SCRIPT_PATH"
-ls -l "$SCRIPT_PATH"
+echo "Python:   $PYTHON_PATH"
+echo "Wrapper:  $WRAPPER_PATH"

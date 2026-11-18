@@ -2,3 +2,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 .DS_Store
+drive_to_mac_host.sh
+*.json
+!extension/manifest.json
